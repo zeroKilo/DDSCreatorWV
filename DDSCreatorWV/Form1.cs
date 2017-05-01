@@ -35,7 +35,7 @@ namespace DDSCreatorWV
                                         "R10G10B10A2_UINT", 
                                         "R11G11B10_FLOAT", 
                                         "R8G8B8A8_UNORM", 
-                                        "8G8B8A8_UNORM_SRGB", 
+                                        "R8G8B8A8_UNORM_SRGB", 
                                         "R8G8B8A8_UINT", 
                                         "R8G8B8A8_SNORM", 
                                         "R8G8B8A8_SINT", 
