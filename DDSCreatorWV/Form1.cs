@@ -168,11 +168,20 @@ namespace DDSCreatorWV
                         inputPath = d.FileName;
                         break;
                     case ".dds":
-                        RunShell("texconv", "-o " + Path.GetDirectoryName(Application.ExecutablePath) + "\\ -ft bmp " + d.FileName);
+                        if (File.Exists("temp.bmp"))
+                            File.Delete("temp.bmp");
+                        long format = QuickFormatGrab(d.FileName);
+                        string addOption = "";
+                        if(format > 0)
+                            switch (format)
+                            {
+                                case 0x53:
+                                    addOption += "-f R8G8B8A8_UNORM ";
+                                    break;
+                            }
+                        rtb1.Text = RunShell("texconv", "-o " + Path.GetDirectoryName(Application.ExecutablePath) + "\\ -ft bmp " + addOption + d.FileName);
                         if (File.Exists(Path.GetFileNameWithoutExtension(d.FileName) + ".bmp"))
                         {
-                            if (File.Exists("temp.bmp"))
-                                File.Delete("temp.bmp");
                             File.Move(Path.GetFileNameWithoutExtension(d.FileName) + ".bmp", "temp.bmp");
                             inputPath = Path.GetDirectoryName(Application.ExecutablePath) + "\\temp.bmp";
                             pic1.Image = LoadImageCopy(inputPath);
@@ -181,6 +190,30 @@ namespace DDSCreatorWV
                 }
                 CreateCall();
             }
+        }
+
+        public long QuickFormatGrab(string filename)
+        {
+            long result = 0;
+            FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
+            fs.Seek(0x54, 0);
+            int fourCC = ReadInt(fs);
+            if (fourCC == 0x30315844)
+            {
+                fs.Seek(0x80, 0);
+                result = (uint)ReadInt(fs);
+            }
+            else
+                result = -(uint)fourCC;
+            fs.Close();
+            return result;
+        }
+
+        public int ReadInt(Stream s)
+        {
+            byte[] buff = new byte[4];
+            s.Read(buff, 0, 4);
+            return BitConverter.ToInt32(buff, 0);
         }
 
         public void CreateCall()
@@ -193,6 +226,20 @@ namespace DDSCreatorWV
                 sb.Append("-pow2 ");
             if (checkBox1.Checked)
                 sb.Append("-dx10 ");
+            if (checkBox4.Checked)
+                sb.Append("-sepalpha ");
+            if (checkBox5.Checked)
+                sb.Append("-pmalpha ");
+            if (checkBox6.Checked)
+                sb.Append("-alpha ");
+            if (checkBox7.Checked)
+                sb.Append("-bcuniform ");
+            if (checkBox8.Checked)
+                sb.Append("-bcdither ");
+            if (checkBox9.Checked)
+                sb.Append("-bcmax ");
+            if (checkBox10.Checked)
+                sb.Append("-bcquick ");
             sb.Append("-ft " + comboBox3.SelectedItem + " ");
             sb.Append("-y -o " + textBox1.Text + " ");
             sb.Append("" + inputPath + " ");
@@ -269,6 +316,41 @@ namespace DDSCreatorWV
             Bitmap result = (Bitmap)loaded.Clone();
             fs.Close();
             return result;
+        }
+
+        private void checkBox4_CheckedChanged(object sender, EventArgs e)
+        {
+            CreateCall();
+        }
+
+        private void checkBox5_CheckedChanged(object sender, EventArgs e)
+        {
+            CreateCall();
+        }
+
+        private void checkBox6_CheckedChanged(object sender, EventArgs e)
+        {
+            CreateCall();
+        }
+
+        private void checkBox7_CheckedChanged(object sender, EventArgs e)
+        {
+            CreateCall();
+        }
+
+        private void checkBox8_CheckedChanged(object sender, EventArgs e)
+        {
+            CreateCall();
+        }
+
+        private void checkBox9_CheckedChanged(object sender, EventArgs e)
+        {
+            CreateCall();
+        }
+
+        private void checkBox10_CheckedChanged(object sender, EventArgs e)
+        {
+            CreateCall();
         }
     }
 }
